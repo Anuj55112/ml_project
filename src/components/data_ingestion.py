@@ -1,0 +1,80 @@
+import os
+import sys
+from dataclasses import dataclass
+
+import pandas as pd
+from sklearn.model_selection import train_test_split
+
+from src.exception import CustomException
+from src.logger import logging
+from src.components.data_transformation import Datatransformation
+from src.components.data_transformation import Datatransformationconfig
+
+@dataclass
+class Datainjectionconfig:
+    train_data_path: str = os.path.join('artifacts', 'train.csv')
+    test_data_path: str = os.path.join('artifacts', 'test.csv')
+    raw_data_path: str = os.path.join('artifacts', 'data.csv')
+
+
+class Datainjection:
+    def __init__(self):
+        self.injection_config = Datainjectionconfig()
+
+    def initiate_data_injection(self):
+        logging.info('Entered the data ingestion method or component')
+
+        try:
+            dataset_path = os.path.join('notebook', 'data', 'stud.csv')
+
+            df = pd.read_csv(dataset_path)
+            logging.info('Read the dataset as dataframe')
+
+            os.makedirs(
+                os.path.dirname(self.injection_config.train_data_path),
+                exist_ok=True
+            )
+
+            df.to_csv(
+                self.injection_config.raw_data_path,
+                index=False,
+                header=True
+            )
+
+            logging.info('Train test split initiated')
+
+            train_set, test_set = train_test_split(
+                df,
+                test_size=0.2,
+                random_state=42
+            )
+
+            train_set.to_csv(
+                self.injection_config.train_data_path,
+                index=False,
+                header=True
+            )
+
+            test_set.to_csv(
+                self.injection_config.test_data_path,
+                index=False,
+                header=True
+            )
+
+            logging.info('Ingestion of the data is completed')
+
+            return (
+                self.injection_config.train_data_path,
+                self.injection_config.test_data_path
+            )
+
+        except Exception as e:
+            raise CustomException(e, sys)
+
+
+if __name__ == '__main__':
+    obj = Datainjection()
+    train_data, test_data =obj.initiate_data_injection()
+    Data_transformation = Datatransformation()
+    Data_transformation.initiate_data_transformation(train_data, test_data)
+    
