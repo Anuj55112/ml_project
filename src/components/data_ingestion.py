@@ -9,6 +9,10 @@ from src.exception import CustomException
 from src.logger import logging
 from src.components.data_transformation import Datatransformation
 from src.components.data_transformation import Datatransformationconfig
+from src.utlis import save_object
+from src.components.model_trainer import ModelTrainer
+from src.components.model_trainer import ModelTrainerConfig
+from src.utlis import evaluate_models
 
 @dataclass
 class Datainjectionconfig:
@@ -76,5 +80,9 @@ if __name__ == '__main__':
     obj = Datainjection()
     train_data, test_data =obj.initiate_data_injection()
     Data_transformation = Datatransformation()
-    Data_transformation.initiate_data_transformation(train_data, test_data)
+    train_arr ,test_arr ,_= Data_transformation.initiate_data_transformation(train_data, test_data)
+   
+    modeltrainer= ModelTrainer()
+    print(modeltrainer.initiate_model_trainer(train_arr, test_arr))
+    
     
